@@ -9,22 +9,14 @@ app.use(express.json());
 
 const JWT_SECRET = "mysecretkey";
 
-// ✅ Allow main Vercel domain + all preview domains + localhost
+// ✅ FIXED CORS (NO CALLBACK, NO SLASH, NO ERRORS)
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-
-      const PROD_FRONTEND = "https://inventory-manager-virid.vercel.app";
-
-      if (origin === PROD_FRONTEND || origin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("❌ Blocked by CORS: " + origin));
-    },
+    origin: [
+      "https://inventory-manager-virid.vercel.app",
+      "http://localhost:4200",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
   })
 );
 
@@ -63,39 +55,38 @@ app.post("/login", async (req, res) => {
 
   const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
-  res.json({
-    message: "Login successful",
-    token,
-    userId: user.id,
-  });
+  res.json({ message: "Login successful", token, userId: user.id });
 });
 
-/******************* INVENTORY CRUD ********************/
+/******************* CRUD INVENTORY *******************/
 app.post("/inventory", async (req, res) => {
   const { name, quantity, price, user_id } = req.body;
-  await pool.query(
-    "INSERT INTO inventory (name, quantity, price, user_id) VALUES ($1, $2, $3, $4)",
-    [name, quantity, price, user_id]
-  );
-  res.json({ message: "Item added ✅" });
+
+  try {
+    await pool.query(
+      "INSERT INTO inventory (name, quantity, price, user_id) VALUES ($1, $2, $3, $4)",
+      [name, quantity, price, user_id]
+    );
+    res.json({ message: "Item added ✅" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error adding item" });
+  }
 });
 
 app.get("/inventory/:userId", async (req, res) => {
-  const { userId } = req.params;
   const result = await pool.query(
     "SELECT * FROM inventory WHERE user_id = $1 ORDER BY id DESC",
-    [userId]
+    [req.params.userId]
   );
   res.json(result.rows);
 });
 
 app.put("/inventory/:id", async (req, res) => {
   const { name, quantity, price } = req.body;
-  const id = req.params.id;
-
   await pool.query(
     "UPDATE inventory SET name = $1, quantity = $2, price = $3 WHERE id = $4",
-    [name, quantity, price, id]
+    [name, quantity, price, req.params.id]
   );
   res.json({ message: "Item updated ✅" });
 });
@@ -105,8 +96,8 @@ app.delete("/inventory/:id", async (req, res) => {
   res.json({ message: "Item deleted ❌" });
 });
 
-/******************* START SERVER *********************/
+/******************* SERVER START (IMPORTANT FOR RENDER) *********************/
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
-  console.log(`✅ Backend running on https://inventory-manager-k10i.onrender.com`)
+  console.log(`✅ Backend started on port ${PORT}`)
 );
