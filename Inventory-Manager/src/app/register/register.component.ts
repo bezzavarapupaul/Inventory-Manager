@@ -22,7 +22,7 @@ export class RegisterComponent {
   constructor(private http: HttpClient,private router: Router) {}
 
   submitForm() {
-    this.http.post("https://inventory-manager-k10i.onrender.com/register", this.registerForm.value)
+    this.http.post("http://localhost:3000/register", this.registerForm.value)
       .subscribe({
         next: (res) => {
           alert("✅ Registered Successfully");
