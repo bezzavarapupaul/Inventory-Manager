@@ -7,13 +7,26 @@ const pool = require("./db");
 const app = express();
 app.use(express.json());
 
-const JWT_SECRET = "mysecretkey";
+const JWT_SECRET = "mysecretkey"; // (move to env later)
 
-// ✅ Correct CORS — MUST BE BEFORE ROUTES
+// ✅ Allow main Vercel URL + preview deployments + localhost
+const allowedOrigins = [
+  "https://inventory-manager-virid.vercel.app",
+  "http://localhost:4200",
+];
+
 app.use(
   cors({
-    origin: "https://inventory-manager-virid.vercel.app", // ✅ NO trailing slash
-    methods: "GET,POST,PUT,DELETE",
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow server-to-server / Postman
+
+      const isAllowed =
+        allowedOrigins.includes(origin) || origin.endsWith(".vercel.app");
+
+      if (isAllowed) callback(null, true);
+      else callback(new Error("❌ CORS blocked: " + origin));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
@@ -111,6 +124,7 @@ app.delete("/inventory/:id", async (req, res) => {
 });
 
 /******************* SERVER START *********************/
-app.listen(3000, () =>
-  console.log("✅ Backend running on https://inventory-manager-k10i.onrender.com")
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () =>
+  console.log(`✅ Backend running on Port ${PORT}`)
 );
