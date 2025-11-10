@@ -27,7 +27,7 @@ export class LoginComponent {
     return;
   }
 
-  this.http.post<any>("http://localhost:3000/login", this.loginForm.value)
+  this.http.post<any>("https://inventory-manager-k10i.onrender.com/login", this.loginForm.value)
     .subscribe({
       next: (response: any) => {
         localStorage.setItem("token", response.token);
