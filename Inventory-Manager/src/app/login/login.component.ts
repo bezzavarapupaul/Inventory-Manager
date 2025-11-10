@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angula
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { response } from 'express';
 
 @Component({
   selector: 'app-login',
@@ -21,17 +22,24 @@ export class LoginComponent {
   constructor(private http: HttpClient,private router: Router) {}
 
   login() {
-    this.http.post("http://localhost:3000/login", this.loginForm.value)
-      .subscribe({
-        next: (res: any) => {
-          alert("✅ Login Successful");
-
-          localStorage.setItem("token", res.token); // ✅ Store JWT token
-
-          this.router.navigate(['/dashboard']); // route to dashboard or home page
-        },
-        error: (err) => alert(err.error.message)
-      });
+  if (!this.loginForm.valid) {
+    alert("Enter valid credentials");
+    return;
   }
+
+  this.http.post<any>("http://localhost:3000/login", this.loginForm.value)
+    .subscribe({
+      next: (response: any) => {
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("userId", response.userId);  // ✅ SAVE USER ID
+
+        alert("Login successful ✅");
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        alert("Invalid email or password ❌");
+      }
+    });
+}
 }
 

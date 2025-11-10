@@ -1,2 +1,38 @@
 <p>dashboard works!</p>
+<h2>Inventory Dashboard</h2>
+
+<form [formGroup]="inventoryForm">
+
+  <input type="text" placeholder="Item Name" formControlName="name">
+  <input type="number" placeholder="Quantity" formControlName="quantity">
+  <input type="number" placeholder="Price" formControlName="price">
+
+  <button *ngIf="!editMode" (click)="addInventory()">Add Item</button>
+  <button *ngIf="editMode" (click)="updateItem()">Update Item</button>
+
+</form>
+
+<hr>
+
+<h3>Stored Items</h3>
+
+<table border="1">
+  <tr>
+    <th>Name</th>
+    <th>Quantity</th>
+    <th>Price</th>
+    <th>Actions</th>
+  </tr>
+
+  <tr *ngFor="let item of items">
+    <td>{{ item.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.price }}</td>
+    <td>
+      <button (click)="editItem(item)">Edit</button>
+      <button (click)="deleteItem(item.id)">Delete</button>
+    </td>
+  </tr>
+</table>
+
 <button (click)="logout()">Logout</button>
