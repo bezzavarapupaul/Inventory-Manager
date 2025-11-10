@@ -5,10 +5,18 @@ const jwt = require("jsonwebtoken");
 const pool = require("./db");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 
 const JWT_SECRET = "mysecretkey";
+
+// ✅ Correct CORS — MUST BE BEFORE ROUTES
+app.use(
+  cors({
+    origin: "https://inventory-manager-virid.vercel.app", // ✅ NO trailing slash
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 
 /******************* REGISTER ************************/
 app.post("/register", async (req, res) => {
@@ -50,7 +58,7 @@ app.post("/login", async (req, res) => {
   res.json({
     message: "Login successful",
     token,
-    userId: user.id // <-- Needed for storing inventory by user
+    userId: user.id,
   });
 });
 
@@ -65,7 +73,6 @@ app.post("/inventory", async (req, res) => {
     );
     res.json({ message: "Item added ✅" });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error adding item" });
   }
 });
@@ -103,16 +110,7 @@ app.delete("/inventory/:id", async (req, res) => {
   res.json({ message: "Item deleted ❌" });
 });
 
-
-const corsOptions = {
-  origin: "https://inventory-manager-virid.vercel.app/",
-  methods: "GET,POST,PUT,DELETE",
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
-
-
 /******************* SERVER START *********************/
-app.listen(3000, () => console.log("✅ Backend running on http://localhost:3000"));
+app.listen(3000, () =>
+  console.log("✅ Backend running on https://inventory-manager-k10i.onrender.com")
+);
