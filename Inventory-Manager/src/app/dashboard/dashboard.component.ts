@@ -52,7 +52,7 @@ export class DashboardComponent implements OnInit {
 
     console.log("Payload being sent:", payload);
 
-    this.http.post("http://localhost:3000/inventory", payload)
+    this.http.post("https://inventory-manager-k10i.onrender.com/inventory", payload)
       .subscribe({
         next: () => {
           alert("Item Added ✅");
@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
 
     const userId = Number(localStorage.getItem("userId"));
 
-    this.http.get<any[]>(`http://localhost:3000/inventory/${userId}`)
+    this.http.get<any[]>(`https://inventory-manager-k10i.onrender.com/inventory/${userId}`)
       .subscribe(data => {
         this.items = data;
       });
@@ -89,7 +89,7 @@ export class DashboardComponent implements OnInit {
   }
 
   updateItem() {
-    this.http.put(`http://localhost:3000/inventory/${this.selectedId}`, this.inventoryForm.value)
+    this.http.put(`https://inventory-manager-k10i.onrender.com/${this.selectedId}`, this.inventoryForm.value)
       .subscribe(() => {
         alert("Item Updated ✅");
         this.inventoryForm.reset();
@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteItem(id: number) {
-    this.http.delete(`http://localhost:3000/inventory/${id}`)
+    this.http.delete(`https://inventory-manager-k10i.onrender.com/inventory/${id}`)
       .subscribe(() => {
         alert("Item Deleted ❌");
         this.loadInventory();
