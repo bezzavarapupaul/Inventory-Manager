@@ -103,10 +103,15 @@ app.delete("/inventory/:id", async (req, res) => {
   res.json({ message: "Item deleted ❌" });
 });
 
-app.use(cors({
+
+const corsOptions = {
   origin: "https://inventory-manager-virid.vercel.app/",
-  credentials: true
-}));
+  methods: "GET,POST,PUT,DELETE",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 
 /******************* SERVER START *********************/
